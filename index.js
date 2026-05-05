@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { exec, spawn } = require('child_process');
+const { spawn } = require('child_process');
 
 const CONFIG_DIR = path.join(process.env.HOME || process.env.USERPROFILE, '.config', 'speed');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'shortcuts.txt');
@@ -30,6 +30,11 @@ function addShortcut(name, command) {
   if (!name || !command) {
     console.log('Usage: speed add <name> -- <command>');
     console.log('  Example: speed add ghpush -- git add . && git commit "$1" && git push');
+    process.exit(1);
+  }
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+    console.log('Invalid name. Use only letters, numbers, underscores, and hyphens.');
     process.exit(1);
   }
 
@@ -105,14 +110,14 @@ function showHelp() {
 Usage: speed <command> [options]
 
 Commands:
-  add <name> <command>  - Add a new shortcut
-  delete <name>        - Delete a shortcut
-  list                 - List all shortcuts
-  run <name> [args]    - Run a shortcut
-  -h, --help           - Show this help
+  add <name> -- <command>  - Add a new shortcut
+  delete <name>          - Delete a shortcut
+  list                   - List all shortcuts
+  run <name> [args]     - Run a shortcut
+  -h, --help            - Show this help
 
 Examples:
-  speed add ghpush "git add . && git commit \\"$1\\" && git push"
+  speed add ghpush -- git add . && git commit "$1" && git push
   speed ghpush "my commit message"
 `);
 }

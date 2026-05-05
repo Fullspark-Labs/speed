@@ -1,0 +1,24 @@
+{
+  "name": "speed-cli",
+  "version": "1.0.0",
+  "description": "A CLI tool for creating command shortcuts - like aliases but with arguments.",
+  "main": "index.js",
+  "bin": {
+    "speed": "./index.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fullspark-Labs/speed.git"
+  },
+  "keywords": ["cli", "shortcuts", "aliases", "productivity"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fullspark-Labs/speed/issues"
+  },
+  "homepage": "https://github.com/Fullspark-Labs/speed#readme"
+}

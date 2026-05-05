@@ -2,11 +2,13 @@
 
 A CLI tool for creating command shortcuts - like aliases but with arguments.
 
+Works on **Windows**, **macOS**, and **Linux**.
+
 ## Usage
 
 ```bash
 # Add a shortcut
-speed add ghpush 'git add . && git commit "$1" && git push'
+speed add ghpush "git add . && git commit \"$1\" && git push"
 
 # Run it
 speed ghpush "my commit message"
@@ -20,6 +22,19 @@ speed delete ghpush
 
 ## Installation
 
+### npm (cross-platform - recommended)
+```bash
+npm install -g speed-cli
+```
+
+### Manual
+```bash
+git clone git@github.com:Fullspark-Labs/speed.git
+cd speed
+npm link
+```
+
+### Linux/macOS (bash)
 ```bash
 git clone git@github.com:Fullspark-Labs/speed.git
 cd speed

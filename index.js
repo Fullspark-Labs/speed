@@ -3,12 +3,20 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const readline = require('readline');
 
 const CONFIG_DIR = path.join(process.env.HOME || process.env.USERPROFILE, '.config', 'speed');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'shortcuts.txt');
 
 if (!fs.existsSync(CONFIG_DIR)) {
   fs.mkdirSync(CONFIG_DIR, { recursive: true });
+}
+
+function createInterface() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 }
 
 function getCommand(name) {
@@ -124,6 +132,57 @@ Examples:
 
 const [,, cmd, ...rest] = process.argv;
 
+function ask(question) {
+  return new Promise(resolve => {
+    const rl = createInterface();
+    rl.question(question, answer => {
+      rl.close();
+      resolve(answer);
+    });
+  });
+}
+
+async function showInteractiveMenu() {
+  const shortcuts = listShortcutsArray();
+  
+  console.log('\n=== speed - Interactive Mode ===\n');
+  console.log('1. Add new shortcut');
+  console.log('2. List shortcuts');
+  shortcuts.forEach((s, i) => console.log(`${i + 3}. ${s.name}`));
+  console.log(`${shortcuts.length + 3}. Exit\n`);
+  
+  const choice = await ask('Select: ');
+  const num = parseInt(choice);
+  
+  if (num === 1) {
+    const name = await ask('Shortcut name: ');
+    const command = await ask('Command: ');
+    addShortcut(name, command);
+    showInteractiveMenu();
+  } else if (num === 2) {
+    listShortcuts();
+    await ask('\nPress enter to continue...');
+    showInteractiveMenu();
+  } else if (num === shortcuts.length + 3) {
+    process.exit(0);
+  } else if (num >= 3 && num <= shortcuts.length + 2) {
+    const s = shortcuts[num - 3];
+    const args = await ask(`Arguments for ${s.name} (optional): `);
+    runShortcut(s.name, args ? args.split(' ').filter(a => a) : []);
+  } else {
+    showInteractiveMenu();
+  }
+}
+
+function listShortcutsArray() {
+  if (!fs.existsSync(CONFIG_FILE) || fs.statSync(CONFIG_FILE).size === 0) return [];
+  const content = fs.readFileSync(CONFIG_FILE, 'utf8');
+  return content.split('\n').filter(l => l.includes('|')).map(line => {
+    const [name, ...cmdParts] = line.split('|');
+    return { name, command: cmdParts.join('|') };
+  });
+}
+
 switch (cmd) {
   case 'add': {
     const { name, command } = parseArgs(rest);
@@ -145,8 +204,8 @@ switch (cmd) {
     showHelp();
     break;
   default:
-    if (!cmd) {
-      showHelp();
+    if (!cmd || cmd === 'i') {
+      showInteractiveMenu();
     } else {
       runShortcut(cmd, rest);
     }

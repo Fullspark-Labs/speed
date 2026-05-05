@@ -10,9 +10,6 @@
   <a href="https://github.com/Fullspark-Labs/speed/blob/main/LICENSE">
     <img src="https://img.shields.io/npm/l/speed-cli.svg" alt="license">
   </a>
-  <a href="https://github.com/Fullspark-Labs/speed/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/Fullspark-Labs/speed/main.svg" alt="build">
-  </a>
 </p>
 
 A CLI tool for creating reusable command shortcuts with arguments. Define once, use anywhere.

@@ -19,10 +19,17 @@ function getCommand(name) {
   return lines[0].split('|').slice(1).join('|');
 }
 
+function parseArgs(args) {
+  const idx = args.indexOf('--');
+  if (idx === -1) return { name: args[0], command: '' };
+  const command = args.slice(idx + 1).join(' ');
+  return { name: args[0], command };
+}
+
 function addShortcut(name, command) {
   if (!name || !command) {
-    console.log('Usage: speed add <name> <command>');
-    console.log('  Example: speed add ghpush "git add . && git commit \\"$1\\" && git push"');
+    console.log('Usage: speed add <name> -- <command>');
+    console.log('  Example: speed add ghpush -- git add . && git commit "$1" && git push');
     process.exit(1);
   }
 
@@ -78,12 +85,11 @@ function runShortcut(name, args = []) {
     cmd = cmd.replaceAll(`$${i + 1}`, arg);
   });
 
-  const shell = process.platform === 'win32' ? 'cmd.exe' : '/bin/bash';
+  const shell = process.platform === 'win32' ? 'cmd.exe' : process.env.SHELL || '/bin/bash';
   const shellFlag = process.platform === 'win32' ? '/c' : '-c';
 
   const child = spawn(shell, [shellFlag, cmd], {
-    stdio: 'inherit',
-    shell: true
+    stdio: 'inherit'
   });
 
   child.on('exit', process.exit);
@@ -109,9 +115,11 @@ Examples:
 const [,, cmd, ...rest] = process.argv;
 
 switch (cmd) {
-  case 'add':
-    addShortcut(rest[0], rest.slice(1).join(' '));
+  case 'add': {
+    const { name, command } = parseArgs(rest);
+    addShortcut(name, command);
     break;
+  }
   case 'delete':
     deleteShortcut(rest[0]);
     break;

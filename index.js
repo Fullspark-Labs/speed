@@ -3,20 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-const readline = require('readline');
+const prompts = require('prompts');
 
 const CONFIG_DIR = path.join(process.env.HOME || process.env.USERPROFILE, '.config', 'speed');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'shortcuts.txt');
 
 if (!fs.existsSync(CONFIG_DIR)) {
   fs.mkdirSync(CONFIG_DIR, { recursive: true });
-}
-
-function createInterface() {
-  return readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
 }
 
 function getCommand(name) {
@@ -132,45 +125,45 @@ Examples:
 
 const [,, cmd, ...rest] = process.argv;
 
-function ask(question) {
-  return new Promise(resolve => {
-    const rl = createInterface();
-    rl.question(question, answer => {
-      rl.close();
-      resolve(answer);
-    });
-  });
-}
-
 async function showInteractiveMenu() {
   const shortcuts = listShortcutsArray();
   
-  console.log('\n=== speed - Interactive Mode ===\n');
-  console.log('1. Add new shortcut');
-  console.log('2. List shortcuts');
-  shortcuts.forEach((s, i) => console.log(`${i + 3}. ${s.name}`));
-  console.log(`${shortcuts.length + 3}. Exit\n`);
+  const actions = [
+    { title: 'Add new shortcut', value: 'add' },
+    { title: 'List shortcuts', value: 'list' },
+    ...shortcuts.map(s => ({ title: `${s.name}`, value: s.name, desc: s.command.substring(0, 50) + '...' })),
+    { title: 'Exit', value: 'exit' }
+  ];
   
-  const choice = await ask('Select: ');
-  const num = parseInt(choice);
-  
-  if (num === 1) {
-    const name = await ask('Shortcut name: ');
-    const command = await ask('Command: ');
-    addShortcut(name, command);
+  const { action } = await prompts({
+    type: 'select',
+    name: 'action',
+    message: '⚡ What do you want to do?',
+    choices: actions,
+    suggestions: actions.map(a => a.title)
+  });
+
+  if (action === 'add') {
+    const { name, command } = await prompts([
+      { type: 'text', name: 'name', message: 'Shortcut name:' },
+      { type: 'text', name: 'command', message: 'Command:', initial: 'echo ' }
+    ]);
+    if (name && command) addShortcut(name, command);
     showInteractiveMenu();
-  } else if (num === 2) {
+  } else if (action === 'list') {
     listShortcuts();
-    await ask('\nPress enter to continue...');
+    await prompts({ type: 'confirm', name: 'done', message: 'Press enter to continue' });
     showInteractiveMenu();
-  } else if (num === shortcuts.length + 3) {
+  } else if (action === 'exit') {
+    console.log('👋 Goodbye!');
     process.exit(0);
-  } else if (num >= 3 && num <= shortcuts.length + 2) {
-    const s = shortcuts[num - 3];
-    const args = await ask(`Arguments for ${s.name} (optional): `);
-    runShortcut(s.name, args ? args.split(' ').filter(a => a) : []);
-  } else {
-    showInteractiveMenu();
+  } else if (action) {
+    const { args } = await prompts({
+      type: 'text',
+      name: 'args',
+      message: `Arguments for ${action} (optional):`
+    });
+    runShortcut(action, args ? args.split(' ').filter(a => a) : []);
   }
 }
 

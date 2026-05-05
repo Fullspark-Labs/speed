@@ -1,7 +1,7 @@
 {
-  "name": "speed-cli",
+  "name": "@FullsparkLabs/speed-cli",
   "version": "1.0.0",
-  "description": "A CLI tool for creating command shortcuts - like aliases but with arguments.",
+  "description": "A CLI tool for creating command shortcuts with arguments.",
   "main": "index.js",
   "bin": {
     "speed": "./index.js"

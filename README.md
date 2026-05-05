@@ -24,7 +24,7 @@ A CLI tool for creating reusable command shortcuts with arguments. Define once, 
 ## Installation
 
 ```bash
-npm install -g speed-cli
+npm install -g @FullsparkLabs/speed-cli
 ```
 
 Or clone and link:

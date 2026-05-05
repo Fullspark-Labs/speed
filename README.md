@@ -24,7 +24,7 @@ A CLI tool for creating reusable command shortcuts with arguments. Define once, 
 ## Installation
 
 ```bash
-npm install -g @FullsparkLabs/speed-cli
+npm install -g @fullsparklabs/speed-cli
 ```
 
 Or clone and link:
@@ -110,6 +110,17 @@ speed add yd -- yarn dev
 # Usage
 speed nd
 speed yd
+```
+
+### SSH Shortcuts
+
+```bash
+speed add ssh -- ssh -i ~/.ssh/$1 user@host
+speed add sftp -- sftp -i ~/.ssh/$1 user@host
+
+# Usage
+speed ssh production
+speed sftp staging
 ```
 
 ## Commands

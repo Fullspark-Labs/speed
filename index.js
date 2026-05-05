@@ -73,7 +73,7 @@ function listShortcuts() {
   });
 }
 
-function runShortcut(name, args = []) {
+function runShortcut(name, runArgs = []) {
   const command = getCommand(name);
   if (!command) {
     console.log(`Shortcut '${name}' not found`);
@@ -81,15 +81,20 @@ function runShortcut(name, args = []) {
   }
 
   let cmd = command;
-  args.forEach((arg, i) => {
+  runArgs.forEach((arg, i) => {
     cmd = cmd.replaceAll(`$${i + 1}`, arg);
   });
 
-  const shell = process.platform === 'win32' ? 'cmd.exe' : process.env.SHELL || '/bin/bash';
-  const shellFlag = process.platform === 'win32' ? '/c' : '-c';
+  if (cmd.includes('git commit ') && !cmd.includes('-m ') && runArgs.length > 0) {
+    cmd = cmd.replace(/git commit "([^"]*)"/, 'git commit -m "$1"');
+  }
 
-  const child = spawn(shell, [shellFlag, cmd], {
-    stdio: 'inherit'
+  const shell = process.platform === 'win32' ? 'cmd.exe' : '/bin/bash';
+  const shellArgs = process.platform === 'win32' ? ['/c', cmd] : ['-c', cmd];
+
+  const child = spawn(shell, shellArgs, {
+    stdio: 'inherit',
+    cwd: process.cwd()
   });
 
   child.on('exit', process.exit);

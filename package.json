@@ -1,6 +1,6 @@
 {
   "name": "@fullsparklabs/speed-cli",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "A CLI tool for creating command shortcuts with arguments.",
   "main": "index.js",
   "bin": {
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/Fullspark-Labs/speed#readme",
   "dependencies": {
+    "cmd-table": "^1.5.2",
     "inquirer": "^11.1.0",
     "prompts": "^2.4.2"
   }
